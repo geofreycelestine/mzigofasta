@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MzigoFasta - On-Demand Truck Logistics in Tanzania</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        header { background: #1a5f2a; color: white; padding: 1rem 0; position: fixed; width: 100%; top: 0; z-index: 100; }
+        nav { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; }
+        .lang-toggle { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; }
+        
+        .hero { background: linear-gradient(135deg, #1a5f2a 0%, #2d8a4e 100%); color: white; padding: 120px 0 80px; text-align: center; }
+        .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+        .hero .subtitle { font-size: 1.2rem; margin-bottom: 1rem; opacity: 0.9; }
+        .hero .subtitle-sw { font-size: 1.1rem; opacity: 0.8; font-style: italic; }
+        
+        .user-types { display: grid; grid-template-columns: 1fr; gap: 2rem; margin: -40px 0 60px; }
+        @media (min-width: 768px) { .user-types { grid-template-columns: 1fr 1fr; } }
+        
+        .user-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
+        .user-card .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .user-card h2 { color: #1a5f2a; margin-bottom: 0.5rem; }
+        .user-card p { color: #666; margin-bottom: 1.5rem; }
+        
+        .btn { display: inline-block; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; font-size: 1rem; width: 100%; }
+        .btn-primary { background: #1a5f2a; color: white; }
+        .btn-secondary { background: #f5a623; color: #333; }
+        
+        .how-it-works { background: white; padding: 60px 0; margin-bottom: 40px; }
+        .section-title { text-align: center; font-size: 2rem; color: #1a5f2a; margin-bottom: 2rem; }
+        .steps { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        @media (min-width: 768px) { .steps { grid-template-columns: repeat(3, 1fr); } }
+        .step { text-align: center; padding: 1.5rem; }
+        .step-number { width: 50px; height: 50px; background: #1a5f2a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 1rem; }
+        
+        .signup-section { background: #1a5f2a; color: white; padding: 60px 0; text-align: center; }
+        .signup-form { max-width: 500px; margin: 2rem auto 0; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group input, .form-group select { width: 100%; padding: 1rem; border: none; border-radius: 8px; font-size: 1rem; }
+        
+        footer { background: #333; color: white; text-align: center; padding: 2rem 0; }
+        
+        .swahili { display: none; }
+        .show-sw .english { display: none; }
+        .show-sw .swahili { display: block; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">🚛 MzigoFasta</div>
+            <button class="lang-toggle" onclick="toggleLang()">
+                <span class="english">Switch to Swahili</span>
+                <span class="swahili">Badilisha Kiingereza</span>
+            </button>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1 class="english">The Smart Way to Move Cargo in Tanzania</h1>
+            <h1 class="swahili">Njia Smart ya kusafirisha Mizigo Tanzania</h1>
+            <p class="subtitle english">Connect with verified truck drivers. Track your cargo in real-time. Pay securely with M-Pesa.</p>
+            <p class="subtitle swahili">Unganika na dereva waliohakikiwa. Fuatilia mizigo kwa wakati halisi. Lipa kwa usalama na M-Pesa.</p>
+            <p class="subtitle-sw english">Simple. Safe. Fast.</p>
+            <p class="subtitle-sw swahili">Rahisi. Salama. Haraka.</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="user-types">
+            <div class="user-card">
+                <div class="icon">📦</div>
+                <h2 class="english">I Need to Ship Cargo</h2>
+                <h2 class="swahili">Nahitaji Kusafirisha Mizigo</h2>
+                <p class="english">Post your load. Get instant quotes from nearby trucks. Track delivery live.</p>
+                <p class="swahili">Tangaza mizigo yako. Pata bei papo hapo. Fuatilia usafirishaji.</p>
+                <a href="#signup" class="btn btn-primary english">Shipper Sign Up</a>
+                <a href="#signup" class="btn btn-primary swahili">Jiunge kama Mteja</a>
+            </div>
+            <div class="user-card">
+                <div class="icon">🚛</div>
+                <h2 class="english">I Have a Truck</h2>
+                <h2 class="swahili">Nina Lori</h2>
+                <p class="english">Find loads near you. Earn more with less empty trips. Get paid fast.</p>
+                <p class="swahili">Tafuta mizigo karibu. Pata zaidi na safari chache za bila mizigo.</p>
+                <a href="#signup" class="btn btn-secondary english">Driver Sign Up</a>
+                <a href="#signup" class="btn btn-secondary swahili">Jiunge kama Dereva</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title english">How It Works</h2>
+            <h2 class="section-title swahili">Jinsi Inavyofanya Kazi</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="english">Post or Find</h3>
+                    <h3 class="swahili">Tangaza au Tafuta</h3>
+                    <p class="english">Shippers post loads. Drivers browse nearby jobs.</p>
+                    <p class="swahili">Wateja wana tangaza. Madereva wanatafuta kazi.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="english">Match & Track</h3>
+                    <h3 class="swahili">Linganisha & Fuatilia</h3>
+                    <p class="english">Get matched instantly. Track your cargo on the map.</p>
+                    <p class="swahili">Linganishwa mara moja. Fuatilia kwenye ramani.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="english">Deliver & Pay</h3>
+                    <h3 class="swahili">Wasiliana & Lipa</h3>
+                    <p class="english">Confirm delivery. Pay safely via mobile money.</p>
+                    <p class="swahili">Thibitisha usafirishaji. Lipa kwa usalama.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="signup-section" id="signup">
+        <div class="container">
+            <h2 class="english">Join the Waiting List</h2>
+            <h2 class="swahili">Jiunge na Orodha ya Wanaosubiri</h2>
+            <p class="english">Be the first to know when we launch. No spam.</p>
+            <p class="swahili">Kuwa wa kwanza kujua. Hakuna spam.</p>
+            <form class="signup-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+                <div class="form-group"><input type="text" name="name" placeholder="Your Name / Jina Lako" required></div>
+                <div class="form-group"><input type="tel" name="phone" placeholder="Phone (e.g. 0712 345 678)" required></div>
+                <div class="form-group">
+                    <select name="user_type" required>
+                        <option value="">I am a... / Mimi ni...</option>
+                        <option value="shipper">Shipper (Mteja)</option>
+                        <option value="driver">Truck Driver (Dereva)</option>
+                        <option value="both">Both (Zote Mbili)</option>
+                    </select>
+                </div>
+                <div class="form-group"><input type="text" name="location" placeholder="City / Mji (e.g. Dar es Salaam)" required></div>
+                <button type="submit" class="btn btn-secondary english">Notify Me When Live</button>
+                <button type="submit" class="btn btn-secondary swahili">Nijulishe Tunapo Zindua</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 MzigoFasta. Tanzania.</p>
+            <p class="english">Built with 💚 for East African logistics</p>
+            <p class="swahili">Ilijengwa kwa 💚 kwa ajili ya usafirishaji</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleLang() { document.body.classList.toggle('show-sw'); }
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
