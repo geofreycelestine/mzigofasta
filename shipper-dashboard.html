@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipper Dashboard - MzigoFasta</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        
+        header { background: #1a5f2a; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .btn { padding: 0.5rem 1rem; border: none; border-radius: 8px; cursor: pointer; }
+        .btn-primary { background: #f5a623; color: #333; }
+        
+        .card { background: white; border-radius: 16px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 1rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 1rem; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: #333; font-weight: bold; }
+        
+        .load-card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; border-left: 4px solid #1a5f2a; }
+        .load-card h3 { color: #1a5f2a; margin-bottom: 0.5rem; }
+        .load-card .route { color: #666; margin-bottom: 0.5rem; }
+        .load-card .price { color: #f5a623; font-weight: bold; font-size: 1.2rem; }
+        .status { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; }
+        .status-open { background: #e8f5e9; color: #1a5f2a; }
+    </style>
+</head>
+<body>
+    <header>
+        <div>🚛 MzigoFasta - Shipper Dashboard</div>
+        <button class="btn btn-primary" onclick="logout()">Logout</button>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <h2>Post a New Load</h2>
+            <form id="postLoadForm">
+                <div class="form-group">
+                    <label>Title / Jina la Mizigo</label>
+                    <input type="text" id="loadTitle" placeholder="e.g. Maize 10 Tons" required>
+                </div>
+                <div class="form-group">
+                    <label>Description / Maelezo</label>
+                    <textarea id="loadDesc" rows="3" placeholder="Describe your cargo..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Pickup Location / Mahali pa Kuchukua</label>
+                    <input type="text" id="pickup" placeholder="e.g. Dar es Salaam" required>
+                </div>
+                <div class="form-group">
+                    <label>Drop-off Location / Mahali pa Kuwasiliana</label>
+                    <input type="text" id="dropoff" placeholder="e.g. Dodoma" required>
+                </div>
+                <div class="form-group">
+                    <label>Cargo Type / Aina ya Mizigo</label>
+                    <select id="cargoType">
+                        <option value="maize">Maize / Mahindi</option>
+                        <option value="cement">Cement / Saruji</option>
+                        <option value="goods">General Goods / Mizigo Mbalimbali</option>
+                        <option value="other">Other / Nyingine</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Weight (kg) / Uzito</label>
+                    <input type="number" id="weight" placeholder="e.g. 10000" required>
+                </div>
+                <div class="form-group">
+                    <label>Truck Type Needed / Aina ya Lori Inayohitajika</label>
+                    <select id="truckType">
+                        <option value="3-ton">Small (3-ton) / Ndogo</option>
+                        <option value="10-ton">Medium (10-ton) / Wastani</option>
+                        <option value="20-ton">Large (20-ton) / Kubwa</option>
+                        <option value="flatbed">Flatbed / Flatbed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Price Offer (TSh) / Bei Unayotoa</label>
+                    <input type="number" id="price" placeholder="e.g. 350000" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem;">Post Load / Tangaza Mizigo</button>
+            </form>
+            <div id="postMessage" style="margin-top: 1rem;"></div>
+        </div>
+        
+        <h2>My Loads / Mizigo Yangu</h2>
+        <div id="myLoads"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+        
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (!token || user.user_type !== 'shipper') {
+            window.location.href = '/index.html';
+        }
+        
+        document.getElementById('postLoadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const loadData = {
+                shipper_id: user.id,
+                title: document.getElementById('loadTitle').value,
+                description: document.getElementById('loadDesc').value,
+                pickup_location: document.getElementById('pickup').value,
+                dropoff_location: document.getElementById('dropoff').value,
+                cargo_type: document.getElementById('cargoType').value,
+                weight_kg: document.getElementById('weight').value,
+                truck_type_needed: document.getElementById('truckType').value,
+                price_offer: document.getElementById('price').value
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/api/loads`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(loadData)
+                });
+                
+                const data = await response.json();
+                const msgDiv = document.getElementById('postMessage');
+                
+                if (response.ok) {
+                    msgDiv.innerHTML = '✅ Load posted successfully!';
+                    document.getElementById('postLoadForm').reset();
+                    loadMyLoads();
+                } else {
+                    msgDiv.innerHTML = `❌ ${data.error || 'Failed to post load'}`;
+                }
+            } catch (error) {
+                document.getElementById('postMessage').innerHTML = '❌ Server error';
+            }
+        });
+        
+        async function loadMyLoads() {
+            try {
+                const response = await fetch(`${API_URL}/api/loads`);
+                const data = await response.json();
+                
+                const container = document.getElementById('myLoads');
+                const myLoads = data.loads.filter(load => load.shipper_id === user.id);
+                
+                if (myLoads.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #666;">No loads posted yet. Post your first load above!</p>';
+                    return;
+                }
+                
+                container.innerHTML = myLoads.map(load => `
+                    <div class="load-card">
+                        <h3>${load.title}</h3>
+                        <div class="route">📍 ${load.pickup_location} → ${load.dropoff_location}</div>
+                        <div class="price">💰 TSh ${load.price_offer.toLocaleString()}</div>
+                        <span class="status status-open">${load.status}</span>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading loads:', error);
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/index.html';
+        }
+        
+        loadMyLoads();
+    </script>
+</body>
+</html>

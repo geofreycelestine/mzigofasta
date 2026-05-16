@@ -131,21 +131,22 @@
             <h2 class="swahili">Jiunge na Orodha ya Wanaosubiri</h2>
             <p class="english">Be the first to know when we launch. No spam.</p>
             <p class="swahili">Kuwa wa kwanza kujua. Hakuna spam.</p>
-            <form class="signup-form" action="https://formspree.io/f/mzdwpzae" method="POST">
-                <div class="form-group"><input type="text" name="name" placeholder="Your Name / Jina Lako" required></div>
-                <div class="form-group"><input type="tel" name="phone" placeholder="Phone (e.g. 0712 345 678)" required></div>
+            <form class="signup-form" id="signupForm">
+                <div class="form-group"><input type="text" name="name" id="regName" placeholder="Your Name / Jina Lako" required></div>
+                <div class="form-group"><input type="tel" name="phone" id="regPhone" placeholder="Phone (e.g. 0712 345 678)" required></div>
                 <div class="form-group">
-                    <select name="user_type" required>
+                    <select name="user_type" id="regUserType" required>
                         <option value="">I am a... / Mimi ni...</option>
                         <option value="shipper">Shipper (Mteja)</option>
                         <option value="driver">Truck Driver (Dereva)</option>
-                        <option value="both">Both (Zote Mbili)</option>
                     </select>
                 </div>
-                <div class="form-group"><input type="text" name="location" placeholder="City / Mji (e.g. Dar es Salaam)" required></div>
-                <button type="submit" class="btn btn-secondary english">Notify Me When Live</button>
-                <button type="submit" class="btn btn-secondary swahili">Nijulishe Tunapo Zindua</button>
+                <div class="form-group"><input type="password" name="password" id="regPassword" placeholder="Password / Nywila" required></div>
+                <div class="form-group"><input type="text" name="location" id="regCity" placeholder="City / Mji (e.g. Dar es Salaam)" required></div>
+                <button type="submit" class="btn btn-secondary english">Create Account</button>
+                <button type="submit" class="btn btn-secondary swahili">Tengeneza Akaunti</button>
             </form>
+            <div id="signupMessage" style="margin-top: 1rem; color: white;"></div>
         </div>
     </section>
 
@@ -158,6 +159,7 @@
     </footer>
 
     <script>
+        // Language toggle
         function toggleLang() { document.body.classList.toggle('show-sw'); }
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -165,6 +167,52 @@
                 document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
             });
         });
+
+        // API base URL - change this when you deploy
+        const API_URL = 'http://localhost:3000';
+        
+        // Handle signup form submission
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('regName').value;
+            const phone = document.getElementById('regPhone').value;
+            const user_type = document.getElementById('regUserType').value;
+            const password = document.getElementById('regPassword').value;
+            const city = document.getElementById('regCity').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, phone, user_type, password, city })
+                });
+                
+                const data = await response.json();
+                const msgDiv = document.getElementById('signupMessage');
+                
+                if (response.ok) {
+                    msgDiv.innerHTML = '✅ Account created! Redirecting...';
+                    // Save token to localStorage
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Redirect based on user type after 2 seconds
+                    setTimeout(() => {
+                        if (data.user.user_type === 'shipper') {
+                            window.location.href = '/shipper-dashboard.html';
+                        } else {
+                            window.location.href = '/driver-dashboard.html';
+                        }
+                    }, 2000);
+                } else {
+                    msgDiv.innerHTML = `❌ ${data.error || 'Registration failed'}`;
+                }
+            } catch (error) {
+                document.getElementById('signupMessage').innerHTML = '❌ Server error. Please try again.';
+            }
+        });
     </script>
+
 </body>
 </html>
