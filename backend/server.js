@@ -43,18 +43,38 @@ function initializeDatabase() {
             is_available INTEGER DEFAULT 1
         )`);
 
-        // Loads table
+        // Loads table - ENHANCED with all Phase 1 fields
         db.exec(`CREATE TABLE IF NOT EXISTS loads (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             shipper_id INTEGER REFERENCES users(id),
+            tracking_number TEXT UNIQUE,
+            material_name TEXT NOT NULL,
+            quantity_tons REAL NOT NULL,
             title TEXT NOT NULL,
             description TEXT,
-            pickup_location TEXT NOT NULL,
-            dropoff_location TEXT NOT NULL,
             cargo_type TEXT,
-            weight_kg REAL,
+            other_cargo_desc TEXT,
+            requires_permit INTEGER DEFAULT 0,
+            permit_details TEXT,
+            health_hazard INTEGER DEFAULT 0,
+            hazard_details TEXT,
+            pickup_region TEXT NOT NULL,
+            pickup_district TEXT NOT NULL,
+            pickup_ward TEXT,
+            pickup_landmark TEXT,
+            dropoff_region TEXT NOT NULL,
+            dropoff_district TEXT NOT NULL,
+            dropoff_ward TEXT,
+            dropoff_landmark TEXT,
             truck_type_needed TEXT,
-            price_offer REAL,
+            rate_per_ton REAL,
+            total_price REAL,
+            vat_exclusive INTEGER DEFAULT 1,
+            pickup_date TEXT,
+            pickup_time TEXT,
+            return_load INTEGER DEFAULT 0,
+            return_date TEXT,
+            return_destination TEXT,
             status TEXT DEFAULT 'open' CHECK(status IN ('open', 'assigned', 'in_transit', 'delivered', 'cancelled')),
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`);
@@ -74,6 +94,14 @@ function initializeDatabase() {
     }
 }
 
+// Generate tracking number
+function generateTrackingNumber() {
+    const prefix = 'MZF';
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+    return `${prefix}-${timestamp}-${random}`;
+}
+
 // JWT secret
 const JWT_SECRET = process.env.JWT_SECRET || 'mzigofasta-secret-2026';
 
@@ -87,28 +115,23 @@ app.post('/api/register', async (req, res) => {
     try {
         const { phone, password, name, user_type, city } = req.body;
 
-        // Check if user exists
         const existingUser = db.prepare('SELECT * FROM users WHERE phone = ?').get(phone);
         if (existingUser) {
             return res.status(400).json({ error: 'Phone number already registered' });
         }
 
-        // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create user
         const result = db.prepare(
             'INSERT INTO users (phone, password, name, user_type, city) VALUES (?, ?, ?, ?, ?)'
         ).run(phone, hashedPassword, name, user_type, city);
 
         const userId = result.lastInsertRowid;
 
-        // If driver, create driver profile
         if (user_type === 'driver') {
             db.prepare('INSERT INTO driver_profiles (user_id) VALUES (?)').run(userId);
         }
 
-        // Generate token
         const token = jwt.sign({ userId }, JWT_SECRET);
 
         res.status(201).json({
@@ -132,13 +155,11 @@ app.post('/api/login', async (req, res) => {
             return res.status(400).json({ error: 'Invalid phone or password' });
         }
 
-        // Check password
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
             return res.status(400).json({ error: 'Invalid phone or password' });
         }
 
-        // Generate token
         const token = jwt.sign({ userId: user.id }, JWT_SECRET);
 
         res.json({
@@ -157,37 +178,127 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Post a load (shipper only)
+// Post a load (shipper only) - ENHANCED
 app.post('/api/loads', (req, res) => {
     try {
-        const { shipper_id, title, description, pickup_location, dropoff_location, cargo_type, weight_kg, truck_type_needed, price_offer } = req.body;
+        const {
+            shipper_id,
+            material_name,
+            quantity_tons,
+            title,
+            description,
+            cargo_type,
+            other_cargo_desc,
+            requires_permit,
+            permit_details,
+            health_hazard,
+            hazard_details,
+            pickup_region,
+            pickup_district,
+            pickup_ward,
+            pickup_landmark,
+            dropoff_region,
+            dropoff_district,
+            dropoff_ward,
+            dropoff_landmark,
+            truck_type_needed,
+            rate_per_ton,
+            total_price,
+            pickup_date,
+            pickup_time,
+            return_load,
+            return_date,
+            return_destination,
+            vat_exclusive
+        } = req.body;
 
-        const result = db.prepare(
-            'INSERT INTO loads (shipper_id, title, description, pickup_location, dropoff_location, cargo_type, weight_kg, truck_type_needed, price_offer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
-        ).run(shipper_id, title, description, pickup_location, dropoff_location, cargo_type, weight_kg, truck_type_needed, price_offer);
+        const trackingNumber = generateTrackingNumber();
+
+        const result = db.prepare(`
+            INSERT INTO loads (
+                shipper_id, tracking_number, material_name, quantity_tons, title, description,
+                cargo_type, other_cargo_desc, requires_permit, permit_details,
+                health_hazard, hazard_details,
+                pickup_region, pickup_district, pickup_ward, pickup_landmark,
+                dropoff_region, dropoff_district, dropoff_ward, dropoff_landmark,
+                truck_type_needed, rate_per_ton, total_price, vat_exclusive,
+                pickup_date, pickup_time, return_load, return_date, return_destination
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+            shipper_id, trackingNumber, material_name, quantity_tons, title, description,
+            cargo_type, other_cargo_desc || null,
+            requires_permit ? 1 : 0, permit_details || null,
+            health_hazard ? 1 : 0, hazard_details || null,
+            pickup_region, pickup_district, pickup_ward || null, pickup_landmark || null,
+            dropoff_region, dropoff_district, dropoff_ward || null, dropoff_landmark || null,
+            truck_type_needed, rate_per_ton, total_price, vat_exclusive ? 1 : 0,
+            pickup_date || null, pickup_time || null,
+            return_load ? 1 : 0, return_date || null, return_destination || null
+        );
 
         res.status(201).json({
             message: 'Load posted successfully',
-            load: { id: result.lastInsertRowid, ...req.body, status: 'open' }
+            tracking_number: trackingNumber,
+            load: { 
+                id: result.lastInsertRowid, 
+                tracking_number: trackingNumber,
+                title,
+                status: 'open'
+            }
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: 'Server error: ' + error.message });
     }
 });
 
 // Get all open loads (for drivers)
 app.get('/api/loads', (req, res) => {
     try {
-        const rows = db.prepare(
-            `SELECT loads.*, users.name as shipper_name, users.phone as shipper_phone 
-             FROM loads 
-             JOIN users ON loads.shipper_id = users.id 
-             WHERE loads.status = ? 
-             ORDER BY loads.created_at DESC`
-        ).all('open');
+        const { shipper_id } = req.query;
+
+        let query = `
+            SELECT loads.*, users.name as shipper_name, users.phone as shipper_phone 
+            FROM loads 
+            JOIN users ON loads.shipper_id = users.id 
+        `;
+        let params = [];
+
+        if (shipper_id) {
+            query += ' WHERE loads.shipper_id = ?';
+            params.push(shipper_id);
+        } else {
+            query += " WHERE loads.status = 'open'";
+        }
+
+        query += ' ORDER BY loads.created_at DESC';
+
+        const rows = db.prepare(query).all(...params);
 
         res.json({ loads: rows });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Get single load by tracking number
+app.get('/api/loads/track/:trackingNumber', (req, res) => {
+    try {
+        const { trackingNumber } = req.params;
+
+        const load = db.prepare(`
+            SELECT loads.*, users.name as shipper_name, users.phone as shipper_phone 
+            FROM loads 
+            JOIN users ON loads.shipper_id = users.id 
+            WHERE loads.tracking_number = ?
+        `).get(trackingNumber);
+
+        if (!load) {
+            return res.status(404).json({ error: 'Load not found' });
+        }
+
+        res.json({ load });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error' });
