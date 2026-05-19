@@ -8,47 +8,53 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        
+
         header { background: #1a5f2a; color: white; padding: 1rem 0; position: fixed; width: 100%; top: 0; z-index: 100; }
         nav { display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 1.5rem; font-weight: bold; }
         .lang-toggle { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; }
-        
+
         .hero { background: linear-gradient(135deg, #1a5f2a 0%, #2d8a4e 100%); color: white; padding: 120px 0 80px; text-align: center; }
         .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; }
         .hero .subtitle { font-size: 1.2rem; margin-bottom: 1rem; opacity: 0.9; }
         .hero .subtitle-sw { font-size: 1.1rem; opacity: 0.8; font-style: italic; }
-        
+
         .user-types { display: grid; grid-template-columns: 1fr; gap: 2rem; margin: -40px 0 60px; }
         @media (min-width: 768px) { .user-types { grid-template-columns: 1fr 1fr; } }
-        
+
         .user-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
         .user-card .icon { font-size: 3rem; margin-bottom: 1rem; }
         .user-card h2 { color: #1a5f2a; margin-bottom: 0.5rem; }
         .user-card p { color: #666; margin-bottom: 1.5rem; }
-        
+
         .btn { display: inline-block; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; font-size: 1rem; width: 100%; }
         .btn-primary { background: #1a5f2a; color: white; }
         .btn-secondary { background: #f5a623; color: #333; }
-        
+
         .how-it-works { background: white; padding: 60px 0; margin-bottom: 40px; }
         .section-title { text-align: center; font-size: 2rem; color: #1a5f2a; margin-bottom: 2rem; }
         .steps { display: grid; grid-template-columns: 1fr; gap: 2rem; }
         @media (min-width: 768px) { .steps { grid-template-columns: repeat(3, 1fr); } }
         .step { text-align: center; padding: 1.5rem; }
         .step-number { width: 50px; height: 50px; background: #1a5f2a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 1rem; }
-        
+
         .signup-section { background: #1a5f2a; color: white; padding: 60px 0; text-align: center; }
+        .login-section { background: #2d8a4e; color: white; padding: 60px 0; text-align: center; }
         .signup-form { max-width: 500px; margin: 2rem auto 0; }
         .form-group { margin-bottom: 1rem; }
         .form-group input, .form-group select { width: 100%; padding: 1rem; border: none; border-radius: 8px; font-size: 1rem; }
-        
+
         footer { background: #333; color: white; text-align: center; padding: 2rem 0; }
-        
+
         .swahili { display: none; }
         .show-sw .english { display: none; }
         .show-sw .swahili { display: block; }
+
+        .message { margin-top: 1rem; padding: 0.8rem; border-radius: 6px; }
+        .message-success { background: rgba(255,255,255,0.2); color: white; }
+        .message-error { background: rgba(220,53,69,0.3); color: #ffcccc; }
     </style>
+<base target="_blank">
 </head>
 <body>
     <header>
@@ -125,28 +131,60 @@
         </div>
     </section>
 
+    <!-- LOGIN SECTION -->
+    <section class="login-section" id="login">
+        <div class="container">
+            <h2 class="english">Already Have an Account?</h2>
+            <h2 class="swahili">Je, Unayo Akaunti Tayari?</h2>
+            <p class="english">Login to access your dashboard and manage your loads.</p>
+            <p class="swahili">Ingia kufikia dashibodi yako na kudhibiti mizigo yako.</p>
+
+            <form class="signup-form" id="loginForm">
+                <div class="form-group">
+                    <input type="tel" id="loginPhone" placeholder="Phone Number / Namba ya Simu" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" placeholder="Password / Nywila" required>
+                </div>
+                <button type="submit" class="btn btn-secondary english">Login</button>
+                <button type="submit" class="btn btn-secondary swahili">Ingia</button>
+            </form>
+            <div id="loginMessage"></div>
+        </div>
+    </section>
+
+    <!-- SIGNUP SECTION -->
     <section class="signup-section" id="signup">
         <div class="container">
             <h2 class="english">Join the Waiting List</h2>
             <h2 class="swahili">Jiunge na Orodha ya Wanaosubiri</h2>
             <p class="english">Be the first to know when we launch. No spam.</p>
             <p class="swahili">Kuwa wa kwanza kujua. Hakuna spam.</p>
+
             <form class="signup-form" id="signupForm">
-                <div class="form-group"><input type="text" name="name" id="regName" placeholder="Your Name / Jina Lako" required></div>
-                <div class="form-group"><input type="tel" name="phone" id="regPhone" placeholder="Phone (e.g. 0712 345 678)" required></div>
                 <div class="form-group">
-                    <select name="user_type" id="regUserType" required>
+                    <input type="text" id="regName" placeholder="Your Name / Jina Lako" required>
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="regPhone" placeholder="Phone (e.g. 0712 345 678)" required>
+                </div>
+                <div class="form-group">
+                    <select id="regUserType" required>
                         <option value="">I am a... / Mimi ni...</option>
                         <option value="shipper">Shipper (Mteja)</option>
                         <option value="driver">Truck Driver (Dereva)</option>
                     </select>
                 </div>
-                <div class="form-group"><input type="password" name="password" id="regPassword" placeholder="Password / Nywila" required></div>
-                <div class="form-group"><input type="text" name="location" id="regCity" placeholder="City / Mji (e.g. Dar es Salaam)" required></div>
+                <div class="form-group">
+                    <input type="password" id="regPassword" placeholder="Password / Nywila" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="regCity" placeholder="City / Mji (e.g. Dar es Salaam)" required>
+                </div>
                 <button type="submit" class="btn btn-secondary english">Create Account</button>
                 <button type="submit" class="btn btn-secondary swahili">Tengeneza Akaunti</button>
             </form>
-            <div id="signupMessage" style="margin-top: 1rem; color: white;"></div>
+            <div id="signupMessage"></div>
         </div>
     </section>
 
@@ -160,7 +198,11 @@
 
     <script>
         // Language toggle
-        function toggleLang() { document.body.classList.toggle('show-sw'); }
+        function toggleLang() { 
+            document.body.classList.toggle('show-sw'); 
+        }
+
+        // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -168,61 +210,97 @@
             });
         });
 
-        // API base URL - change this when you deploy
+        // API base URL
         const API_URL = 'https://mzigofasta.onrender.com';
-        
-        // Handle signup form submission
+
+        // Handle LOGIN form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const phone = document.getElementById('loginPhone').value;
+            const password = document.getElementById('loginPassword').value;
+            const msgDiv = document.getElementById('loginMessage');
+
+            try {
+                const response = await fetch(`${API_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('userId', data.user.id);
+                    localStorage.setItem('userType', data.user.user_type);
+                    localStorage.setItem('userName', data.user.name);
+
+                    msgDiv.className = 'message message-success';
+                    msgDiv.innerHTML = '✅ Login successful! Redirecting... / Kuingia kumefanikiwa! Inaelekeza...';
+
+                    setTimeout(() => {
+                        if (data.user.user_type === 'shipper') {
+                            window.location.href = 'shipper-dashboard.html';
+                        } else {
+                            window.location.href = 'driver-dashboard.html';
+                        }
+                    }, 1500);
+                } else {
+                    msgDiv.className = 'message message-error';
+                    msgDiv.innerHTML = `❌ ${data.error || 'Invalid phone or password / Namba au nywila si sahihi'}`;
+                }
+            } catch (error) {
+                msgDiv.className = 'message message-error';
+                msgDiv.innerHTML = '❌ Server error. Please try again. / Kosa la seva. Jaribu tena.';
+            }
+        });
+
+        // Handle SIGNUP form submission
         document.getElementById('signupForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
             const name = document.getElementById('regName').value;
             const phone = document.getElementById('regPhone').value;
             const user_type = document.getElementById('regUserType').value;
             const password = document.getElementById('regPassword').value;
             const city = document.getElementById('regCity').value;
-            
+            const msgDiv = document.getElementById('signupMessage');
+
             try {
                 const response = await fetch(`${API_URL}/api/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, phone, user_type, password, city })
                 });
-                
+
                 const data = await response.json();
-                const msgDiv = document.getElementById('signupMessage');
-                
+
                 if (response.ok) {
-                    msgDiv.innerHTML = '✅ Account created! Redirecting...';
-                    // Save token to localStorage
                     localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    
-                    // Redirect based on user type after 2 seconds
+                    localStorage.setItem('userId', data.user.id);
+                    localStorage.setItem('userType', data.user.user_type);
+                    localStorage.setItem('userName', data.user.name);
+
+                    msgDiv.className = 'message message-success';
+                    msgDiv.innerHTML = '✅ Account created! Redirecting... / Akaunti imeundwa! Inaelekeza...';
+
                     setTimeout(() => {
                         if (data.user.user_type === 'shipper') {
-                            window.location.href = '/shipper-dashboard.html';
+                            window.location.href = 'shipper-dashboard.html';
                         } else {
-                            window.location.href = '/driver-dashboard.html';
+                            window.location.href = 'driver-dashboard.html';
                         }
                     }, 2000);
                 } else {
+                    msgDiv.className = 'message message-error';
                     msgDiv.innerHTML = `❌ ${data.error || 'Registration failed'}`;
                 }
             } catch (error) {
-                document.getElementById('signupMessage').innerHTML = '❌ Server error. Please try again.';
+                msgDiv.className = 'message message-error';
+                msgDiv.innerHTML = '❌ Server error. Please try again.';
             }
         });
     </script>
-
-<!-- rebuild trigger -->
-<<!-- rebuild trigger -->
-<<!-- rebuild trigger -->
-print("=== LOGIN SECTION CODE ===")
-print(login_section)
-print("\n" + "="*60)
-print("\nINSTRUCTIONS:")
-print("1. Open index.html in VS Code")
-print("2. Find the closing </body> tag")
-print("3. Paste the login section ABOVE
-<</body>
+</body>
 </html>
