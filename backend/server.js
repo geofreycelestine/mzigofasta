@@ -262,13 +262,30 @@ app.post('/api/loads', (req, res) => {
     }
 });
 
-// Get all open loads (for drivers)
+// Get all open loads (for drivers) - WITH LOCATION CONCATENATION
 app.get('/api/loads', (req, res) => {
     try {
         const { shipper_id } = req.query;
 
         let query = `
-            SELECT loads.*, users.name as shipper_name, users.phone as shipper_phone 
+            SELECT 
+                loads.*, 
+                users.name as shipper_name, 
+                users.phone as shipper_phone,
+                (loads.pickup_region || ', ' || loads.pickup_district || 
+                 CASE WHEN loads.pickup_ward IS NOT NULL AND loads.pickup_ward != '' 
+                      THEN ', ' || loads.pickup_ward 
+                      ELSE '' END ||
+                 CASE WHEN loads.pickup_landmark IS NOT NULL AND loads.pickup_landmark != '' 
+                      THEN ' (' || loads.pickup_landmark || ')' 
+                      ELSE '' END) as pickup_location,
+                (loads.dropoff_region || ', ' || loads.dropoff_district || 
+                 CASE WHEN loads.dropoff_ward IS NOT NULL AND loads.dropoff_ward != '' 
+                      THEN ', ' || loads.dropoff_ward 
+                      ELSE '' END ||
+                 CASE WHEN loads.dropoff_landmark IS NOT NULL AND loads.dropoff_landmark != '' 
+                      THEN ' (' || loads.dropoff_landmark || ')' 
+                      ELSE '' END) as dropoff_location
             FROM loads 
             JOIN users ON loads.shipper_id = users.id 
         `;
@@ -292,13 +309,30 @@ app.get('/api/loads', (req, res) => {
     }
 });
 
-// Get single load by tracking number
+// Get single load by tracking number - WITH LOCATION CONCATENATION
 app.get('/api/loads/track/:trackingNumber', (req, res) => {
     try {
         const { trackingNumber } = req.params;
 
         const load = db.prepare(`
-            SELECT loads.*, users.name as shipper_name, users.phone as shipper_phone 
+            SELECT 
+                loads.*, 
+                users.name as shipper_name, 
+                users.phone as shipper_phone,
+                (loads.pickup_region || ', ' || loads.pickup_district || 
+                 CASE WHEN loads.pickup_ward IS NOT NULL AND loads.pickup_ward != '' 
+                      THEN ', ' || loads.pickup_ward 
+                      ELSE '' END ||
+                 CASE WHEN loads.pickup_landmark IS NOT NULL AND loads.pickup_landmark != '' 
+                      THEN ' (' || loads.pickup_landmark || ')' 
+                      ELSE '' END) as pickup_location,
+                (loads.dropoff_region || ', ' || loads.dropoff_district || 
+                 CASE WHEN loads.dropoff_ward IS NOT NULL AND loads.dropoff_ward != '' 
+                      THEN ', ' || loads.dropoff_ward 
+                      ELSE '' END ||
+                 CASE WHEN loads.dropoff_landmark IS NOT NULL AND loads.dropoff_landmark != '' 
+                      THEN ' (' || loads.dropoff_landmark || ')' 
+                      ELSE '' END) as dropoff_location
             FROM loads 
             JOIN users ON loads.shipper_id = users.id 
             WHERE loads.tracking_number = ?

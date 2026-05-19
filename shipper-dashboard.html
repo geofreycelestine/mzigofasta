@@ -543,13 +543,19 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    document.getElementById('successMsg').style.display = 'block';
+                    const successDiv = document.getElementById('successMsg');
+                    successDiv.innerHTML = `
+                        ✅ <strong>Load posted successfully!</strong><br>
+                        📋 <strong>Tracking Number:</strong> ${data.tracking_number}<br>
+                        <span style="font-size: 0.9rem;">Save this number to track your cargo</span>
+                    `;
+                    successDiv.style.display = 'block';
                     document.getElementById('loadForm').reset();
                     document.getElementById('loadTitle').value = '';
                     document.getElementById('totalPrice').value = '';
                     setTimeout(() => {
-                        document.getElementById('successMsg').style.display = 'none';
-                    }, 3000);
+                        successDiv.style.display = 'none';
+                    }, 5000);
                     loadMyLoads();
                 } else {
                     alert(data.error || 'Failed to post load');
@@ -574,9 +580,10 @@
                     container.innerHTML = data.loads.map(load => `
                         <div class="load-item">
                             <h3>${load.title}</h3>
-                            <p>📍 ${load.pickup_location} → ${load.dropoff_location}</p>
-                            <p>📦 ${load.cargo_type} | 🚛 ${load.truck_type_needed}</p>
-                            <p class="load-price">💰 TSh ${load.total_price?.toLocaleString() || load.price_offer?.toLocaleString()}</p>
+                            <p><strong>📋 Tracking:</strong> <span style="color: #1a5f2a; font-weight: bold;">${load.tracking_number || 'N/A'}</span></p>
+                            <p>📍 ${load.pickup_location || 'Location not specified'} → ${load.dropoff_location || 'Location not specified'}</p>
+                            <p>📦 ${load.cargo_type || 'N/A'} | 🚛 ${load.truck_type_needed || 'N/A'}</p>
+                            <p class="load-price">💰 TSh ${(load.total_price || 0).toLocaleString()}</p>
                             <span class="load-status">${load.status}</span>
                         </div>
                     `).join('');
