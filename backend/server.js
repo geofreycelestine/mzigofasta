@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,8 +13,17 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Database path
+const dbPath = path.join(__dirname, 'mzigofasta.db');
+
+// Force recreate tables (remove in production after first deploy)
+if (fs.existsSync(dbPath)) {
+    fs.unlinkSync(dbPath);
+    console.log('✅ Old database removed, new schema will be created');
+}
+
 // Database setup
-const db = new Database('./mzigofasta.db');
+const db = new Database(dbPath);
 console.log('✅ Connected to SQLite database');
 initializeDatabase();
 
