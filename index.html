@@ -3,63 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MzigoFasta - On-Demand Truck Logistics in Tanzania</title>
+    <title>Rodin - On-Demand Truck Logistics in Tanzania</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-        header { background: #1a5f2a; color: white; padding: 1rem 0; position: fixed; width: 100%; top: 0; z-index: 100; }
-        nav { display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.5rem; font-weight: bold; }
-        .lang-toggle { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; }
+        /* RODIN BRAND COLORS */
+        :root {
+            --deep-crust: #1B3A4B;
+            --mantle-green: #2D6A4F;
+            --magma-orange: #E85D04;
+            --golden-core: #F4A261;
+            --sediment: #E9C46A;
+            --ocean-blue: #264653;
+            --ash-gray: #E5E5E5;
+            --lava-red: #D62828;
+        }
 
-        .hero { background: linear-gradient(135deg, #1a5f2a 0%, #2d8a4e 100%); color: white; padding: 120px 0 80px; text-align: center; }
-        .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+        header { background: var(--deep-crust); color: white; padding: 1rem 0; position: fixed; width: 100%; top: 0; z-index: 100; }
+        nav { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .logo-icon { width: 32px; height: 32px; background: var(--mantle-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .lang-toggle { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; font-family: 'Inter', sans-serif; }
+
+        .hero { background: linear-gradient(135deg, var(--deep-crust) 0%, var(--ocean-blue) 100%); color: white; padding: 120px 0 80px; text-align: center; }
+        .hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 2.5rem; margin-bottom: 1rem; font-weight: 700; }
         .hero .subtitle { font-size: 1.2rem; margin-bottom: 1rem; opacity: 0.9; }
         .hero .subtitle-sw { font-size: 1.1rem; opacity: 0.8; font-style: italic; }
+        .hero .tagline { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; color: var(--golden-core); margin-top: 1rem; letter-spacing: 2px; }
 
         .user-types { display: grid; grid-template-columns: 1fr; gap: 2rem; margin: -40px 0 60px; }
         @media (min-width: 768px) { .user-types { grid-template-columns: 1fr 1fr; } }
 
-        .user-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
+        .user-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; border-top: 4px solid var(--mantle-green); }
+        .user-card:nth-child(2) { border-top-color: var(--magma-orange); }
         .user-card .icon { font-size: 3rem; margin-bottom: 1rem; }
-        .user-card h2 { color: #1a5f2a; margin-bottom: 0.5rem; }
+        .user-card h2 { font-family: 'Space Grotesk', sans-serif; color: var(--deep-crust); margin-bottom: 0.5rem; }
         .user-card p { color: #666; margin-bottom: 1.5rem; }
 
-        .btn { display: inline-block; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; font-size: 1rem; width: 100%; }
-        .btn-primary { background: #1a5f2a; color: white; }
-        .btn-secondary { background: #f5a623; color: #333; }
+        .btn { display: inline-block; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; font-size: 1rem; width: 100%; font-family: 'Inter', sans-serif; transition: all 0.3s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .btn-primary { background: var(--deep-crust); color: white; }
+        .btn-secondary { background: var(--magma-orange); color: white; }
 
         .how-it-works { background: white; padding: 60px 0; margin-bottom: 40px; }
-        .section-title { text-align: center; font-size: 2rem; color: #1a5f2a; margin-bottom: 2rem; }
+        .section-title { text-align: center; font-family: 'Space Grotesk', sans-serif; font-size: 2rem; color: var(--deep-crust); margin-bottom: 2rem; }
         .steps { display: grid; grid-template-columns: 1fr; gap: 2rem; }
         @media (min-width: 768px) { .steps { grid-template-columns: repeat(3, 1fr); } }
         .step { text-align: center; padding: 1.5rem; }
-        .step-number { width: 50px; height: 50px; background: #1a5f2a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 1rem; }
+        .step-number { width: 50px; height: 50px; background: var(--deep-crust); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 1rem; font-family: 'Space Grotesk', sans-serif; }
 
-        .signup-section { background: #1a5f2a; color: white; padding: 60px 0; text-align: center; }
-        .login-section { background: #2d8a4e; color: white; padding: 60px 0; text-align: center; }
+        .login-section { background: var(--ocean-blue); color: white; padding: 60px 0; text-align: center; }
+        .signup-section { background: var(--deep-crust); color: white; padding: 60px 0; text-align: center; }
         .signup-form { max-width: 500px; margin: 2rem auto 0; }
         .form-group { margin-bottom: 1rem; }
-        .form-group input, .form-group select { width: 100%; padding: 1rem; border: none; border-radius: 8px; font-size: 1rem; }
+        .form-group input, .form-group select { width: 100%; padding: 1rem; border: none; border-radius: 8px; font-size: 1rem; font-family: 'Inter', sans-serif; }
+        .form-group input:focus, .form-group select:focus { outline: 2px solid var(--golden-core); }
 
-        footer { background: #333; color: white; text-align: center; padding: 2rem 0; }
+        .message { margin-top: 1rem; padding: 0.8rem; border-radius: 6px; font-family: 'Inter', sans-serif; }
+        .message-success { background: rgba(45, 106, 79, 0.3); color: white; border: 1px solid var(--mantle-green); }
+        .message-error { background: rgba(214, 40, 40, 0.2); color: #ffcccc; border: 1px solid var(--lava-red); }
+
+        footer { background: var(--deep-crust); color: white; text-align: center; padding: 2rem 0; }
+        footer .brand { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        footer .tagline { color: var(--golden-core); font-size: 0.9rem; }
 
         .swahili { display: none; }
         .show-sw .english { display: none; }
         .show-sw .swahili { display: block; }
 
-        .message { margin-top: 1rem; padding: 0.8rem; border-radius: 6px; }
-        .message-success { background: rgba(255,255,255,0.2); color: white; }
-        .message-error { background: rgba(220,53,69,0.3); color: #ffcccc; }
+        /* Loading animation */
+        .loading-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
     </style>
 <base target="_blank">
 </head>
 <body>
     <header>
         <nav class="container">
-            <div class="logo">🚛 MzigoFasta</div>
+            <div class="logo">
+                <span class="logo-icon">🌍</span>
+                <span>RODIN</span>
+            </div>
             <button class="lang-toggle" onclick="toggleLang()">
                 <span class="english">Switch to Swahili</span>
                 <span class="swahili">Badilisha Kiingereza</span>
@@ -75,6 +107,7 @@
             <p class="subtitle swahili">Unganika na dereva waliohakikiwa. Fuatilia mizigo kwa wakati halisi. Lipa kwa usalama na M-Pesa.</p>
             <p class="subtitle-sw english">Simple. Safe. Fast.</p>
             <p class="subtitle-sw swahili">Rahisi. Salama. Haraka.</p>
+            <p class="tagline">BUILT ON BEDROCK</p>
         </div>
     </section>
 
@@ -190,9 +223,12 @@
 
     <footer>
         <div class="container">
-            <p>© 2026 MzigoFasta. Tanzania.</p>
-            <p class="english">Built with 💚 for East African logistics</p>
-            <p class="swahili">Ilijengwa kwa 💚 kwa ajili ya usafirishaji</p>
+            <div class="brand">🌍 RODIN</div>
+            <p class="tagline">Built on bedrock. Moving what matters.</p>
+            <p class="english">© 2026 Rodin. Tanzania. All rights reserved.</p>
+            <p class="swahili">© 2026 Rodin. Tanzania. Haki zote zimehifadhiwa.</p>
+            <p class="english" style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.7;">Inspired by Rodinia — the ancient supercontinent that connected all land.</p>
+            <p class="swahili" style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.7;">Imehamasishwa na Rodinia — bara kubwa la kale liliyounganisha ardhi yote.</p>
         </div>
     </footer>
 

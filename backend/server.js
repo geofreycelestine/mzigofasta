@@ -98,6 +98,17 @@ function initializeDatabase() {
             status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'accepted', 'rejected', 'completed'))
         )`);
 
+        // Phase 2: SMS Notifications log
+        db.exec(`CREATE TABLE IF NOT EXISTS sms_notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            load_id INTEGER REFERENCES loads(id),
+            phone TEXT NOT NULL,
+            message TEXT NOT NULL,
+            type TEXT CHECK(type IN ('tracking', 'status_update', 'delivery_confirmation')),
+            sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'sent', 'failed'))
+        )`);
+
         console.log('✅ Database tables initialized');
     } catch (err) {
         console.error('Error creating tables:', err);
@@ -106,18 +117,29 @@ function initializeDatabase() {
 
 // Generate tracking number
 function generateTrackingNumber() {
-    const prefix = 'MZF';
+    const prefix = 'RDN';
     const timestamp = Date.now().toString(36).toUpperCase();
     const random = Math.random().toString(36).substring(2, 6).toUpperCase();
     return `${prefix}-${timestamp}-${random}`;
 }
 
+// Phase 2: Simulate SMS sending
+function simulateSMS(phone, message, type) {
+    console.log(`📱 SMS [${type}] to ${phone}: ${message}`);
+    // In production, integrate with Twilio, Africa's Talking, etc.
+    return { status: 'sent', messageId: `SMS-${Date.now()}` };
+}
+
 // JWT secret
-const JWT_SECRET = process.env.JWT_SECRET || 'mzigofasta-secret-2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'rodin-secret-2026';
 
 // Test route
 app.get('/', (req, res) => {
-    res.json({ message: '🚛 MzigoFasta API is running!' });
+    res.json({ 
+        message: '🌍 Rodin API is running!',
+        tagline: 'Built on bedrock. Moving what matters.',
+        version: '2.0.0'
+    });
 });
 
 // Register user
@@ -188,7 +210,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Post a load (shipper only) - ENHANCED
+// Post a load (shipper only) - ENHANCED with SMS
 app.post('/api/loads', (req, res) => {
     try {
         const {
@@ -245,6 +267,18 @@ app.post('/api/loads', (req, res) => {
             pickup_date || null, pickup_time || null,
             return_load ? 1 : 0, return_date || null, return_destination || null
         );
+
+        // Phase 2: Send SMS notification to shipper
+        const shipper = db.prepare('SELECT phone FROM users WHERE id = ?').get(shipper_id);
+        if (shipper) {
+            const smsMessage = `RODIN: Your load "${title}" has been posted! Tracking: ${trackingNumber}. Track at rodin.co/track/${trackingNumber}`;
+            const smsResult = simulateSMS(shipper.phone, smsMessage, 'tracking');
+
+            // Log SMS
+            db.prepare(
+                'INSERT INTO sms_notifications (load_id, phone, message, type, status) VALUES (?, ?, ?, ?, ?)'
+            ).run(result.lastInsertRowid, shipper.phone, smsMessage, 'tracking', smsResult.status);
+        }
 
         res.status(201).json({
             message: 'Load posted successfully',
@@ -349,8 +383,60 @@ app.get('/api/loads/track/:trackingNumber', (req, res) => {
     }
 });
 
+// Phase 2: Update load status (for drivers)
+app.put('/api/loads/:id/status', (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status, driver_id } = req.body;
+
+        // Update load status
+        db.prepare('UPDATE loads SET status = ? WHERE id = ?').run(status, id);
+
+        // If assigned, create assignment record
+        if (status === 'assigned' && driver_id) {
+            db.prepare('INSERT INTO assignments (load_id, driver_id, status) VALUES (?, ?, ?)')
+              .run(id, driver_id, 'pending');
+        }
+
+        // Get load details for SMS
+        const load = db.prepare('SELECT * FROM loads WHERE id = ?').get(id);
+        const shipper = db.prepare('SELECT phone FROM users WHERE id = ?').get(load.shipper_id);
+
+        // Send status update SMS
+        if (shipper) {
+            const statusMessages = {
+                'assigned': `RODIN: Driver assigned to "${load.title}"! Tracking: ${load.tracking_number}`,
+                'in_transit': `RODIN: Your cargo "${load.title}" is now in transit! Track: ${load.tracking_number}`,
+                'delivered': `RODIN: 🎉 Your cargo "${load.title}" has been delivered! Tracking: ${load.tracking_number}`
+            };
+
+            if (statusMessages[status]) {
+                simulateSMS(shipper.phone, statusMessages[status], 'status_update');
+            }
+        }
+
+        res.json({ message: 'Status updated', status });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Phase 2: Get SMS history for a load
+app.get('/api/loads/:id/sms', (req, res) => {
+    try {
+        const { id } = req.params;
+        const messages = db.prepare('SELECT * FROM sms_notifications WHERE load_id = ? ORDER BY sent_at DESC').all(id);
+        res.json({ messages });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 // Start server
 app.listen(PORT, () => {
-    console.log(`🚛 MzigoFasta server running on port ${PORT}`);
+    console.log(`🌍 Rodin server running on port ${PORT}`);
     console.log(`📡 API available at http://localhost:${PORT}`);
+    console.log(`🏗️ Built on bedrock. Moving what matters.`);
 });
