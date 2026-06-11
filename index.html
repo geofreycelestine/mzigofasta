@@ -3,340 +3,795 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rodin - On-Demand Truck Logistics in Tanzania</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Rodin - Logistics for Africa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-        /* RODIN BRAND COLORS */
         :root {
             --deep-crust: #1B3A4B;
             --mantle-green: #2D6A4F;
             --magma-orange: #E85D04;
             --golden-core: #F4A261;
-            --sediment: #E9C46A;
             --ocean-blue: #264653;
-            --ash-gray: #E5E5E5;
-            --lava-red: #D62828;
+            --sky-blue: #4A90E2;
+            --light-bg: #F0F4F8;
+            --white: #FFFFFF;
+            --text-dark: #1B3A4B;
+            --text-muted: #6B7280;
         }
 
-        header { background: var(--deep-crust); color: white; padding: 1rem 0; position: fixed; width: 100%; top: 0; z-index: 100; }
-        nav { display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-        .logo-icon { width: 32px; height: 32px; background: var(--mantle-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
-        .lang-toggle { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; font-family: 'Inter', sans-serif; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--light-bg); 
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
 
-        .hero { background: linear-gradient(135deg, var(--deep-crust) 0%, var(--ocean-blue) 100%); color: white; padding: 120px 0 80px; text-align: center; }
-        .hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 2.5rem; margin-bottom: 1rem; font-weight: 700; }
-        .hero .subtitle { font-size: 1.2rem; margin-bottom: 1rem; opacity: 0.9; }
-        .hero .subtitle-sw { font-size: 1.1rem; opacity: 0.8; font-style: italic; }
-        .hero .tagline { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; color: var(--golden-core); margin-top: 1rem; letter-spacing: 2px; }
+        /* Navbar - BRELA Style */
+        .navbar {
+            background: linear-gradient(135deg, var(--deep-crust) 0%, var(--ocean-blue) 100%);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
 
-        .user-types { display: grid; grid-template-columns: 1fr; gap: 2rem; margin: -40px 0 60px; }
-        @media (min-width: 768px) { .user-types { grid-template-columns: 1fr 1fr; } }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-        .user-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; border-top: 4px solid var(--mantle-green); }
-        .user-card:nth-child(2) { border-top-color: var(--magma-orange); }
-        .user-card .icon { font-size: 3rem; margin-bottom: 1rem; }
-        .user-card h2 { font-family: 'Space Grotesk', sans-serif; color: var(--deep-crust); margin-bottom: 0.5rem; }
-        .user-card p { color: #666; margin-bottom: 1.5rem; }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-        .btn { display: inline-block; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; font-size: 1rem; width: 100%; font-family: 'Inter', sans-serif; transition: all 0.3s; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        .btn-primary { background: var(--deep-crust); color: white; }
-        .btn-secondary { background: var(--magma-orange); color: white; }
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--mantle-green), var(--sky-blue));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
 
-        .how-it-works { background: white; padding: 60px 0; margin-bottom: 40px; }
-        .section-title { text-align: center; font-family: 'Space Grotesk', sans-serif; font-size: 2rem; color: var(--deep-crust); margin-bottom: 2rem; }
-        .steps { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-        @media (min-width: 768px) { .steps { grid-template-columns: repeat(3, 1fr); } }
-        .step { text-align: center; padding: 1.5rem; }
-        .step-number { width: 50px; height: 50px; background: var(--deep-crust); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 1rem; font-family: 'Space Grotesk', sans-serif; }
+        .brand-text h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1.2;
+        }
 
-        .login-section { background: var(--ocean-blue); color: white; padding: 60px 0; text-align: center; }
-        .signup-section { background: var(--deep-crust); color: white; padding: 60px 0; text-align: center; }
-        .signup-form { max-width: 500px; margin: 2rem auto 0; }
-        .form-group { margin-bottom: 1rem; }
-        .form-group input, .form-group select { width: 100%; padding: 1rem; border: none; border-radius: 8px; font-size: 1rem; font-family: 'Inter', sans-serif; }
-        .form-group input:focus, .form-group select:focus { outline: 2px solid var(--golden-core); }
+        .brand-text p {
+            font-size: 0.75rem;
+            color: var(--golden-core);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
 
-        .message { margin-top: 1rem; padding: 0.8rem; border-radius: 6px; font-family: 'Inter', sans-serif; }
-        .message-success { background: rgba(45, 106, 79, 0.3); color: white; border: 1px solid var(--mantle-green); }
-        .message-error { background: rgba(214, 40, 40, 0.2); color: #ffcccc; border: 1px solid var(--lava-red); }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
 
-        footer { background: var(--deep-crust); color: white; text-align: center; padding: 2rem 0; }
-        footer .brand { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
-        footer .tagline { color: var(--golden-core); font-size: 0.9rem; }
+        .nav-links a {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
 
+        .nav-links a:hover {
+            color: var(--golden-core);
+        }
+
+        .btn-login {
+            background: var(--magma-orange);
+            color: var(--white);
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-login:hover {
+            background: #d15104;
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section - BRELA Card Style */
+        .hero {
+            margin-top: 80px;
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-card {
+            background: linear-gradient(135deg, var(--deep-crust) 0%, var(--ocean-blue) 50%, var(--sky-blue) 100%);
+            border-radius: 24px;
+            padding: 4rem;
+            color: var(--white);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            box-shadow: 0 20px 60px rgba(27, 58, 75, 0.3);
+        }
+
+        .hero-content h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--magma-orange);
+            color: var(--white);
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: #d15104;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(232, 93, 4, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.15);
+            color: var(--white);
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* Hero Features Grid */
+        .hero-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .feature-tile {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s;
+        }
+
+        .feature-tile:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-5px);
+        }
+
+        .feature-tile .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-tile h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .feature-tile p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* What You Can Do Section */
+        .services-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--deep-crust);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-card:nth-child(1) .service-icon { background: linear-gradient(135deg, #E3F2FD, #BBDEFB); }
+        .service-card:nth-child(2) .service-icon { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); }
+        .service-card:nth-child(3) .service-icon { background: linear-gradient(135deg, #FFF3E0, #FFE0B2); }
+        .service-card:nth-child(4) .service-icon { background: linear-gradient(135deg, #F3E5F5, #E1BEE7); }
+
+        .service-card h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--deep-crust);
+        }
+
+        .service-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            background: var(--white);
+            padding: 4rem 2rem;
+        }
+
+        .how-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step-card {
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--mantle-green), var(--sky-blue));
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 1.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .step-card h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--deep-crust);
+        }
+
+        .step-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Trust Section */
+        .trust-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .trust-item {
+            text-align: center;
+            padding: 2rem;
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .trust-item .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .trust-item h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--deep-crust);
+            margin-bottom: 0.5rem;
+        }
+
+        .trust-item p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .cta-card {
+            background: linear-gradient(135deg, var(--mantle-green) 0%, var(--sky-blue) 100%);
+            border-radius: 24px;
+            padding: 4rem;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .cta-card h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .cta-card p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--deep-crust);
+            color: var(--white);
+            padding: 3rem 2rem 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-brand h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-brand p {
+            color: var(--golden-core);
+            font-size: 0.9rem;
+        }
+
+        .footer-links h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--golden-core);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-card {
+                grid-template-columns: 1fr;
+                padding: 2rem;
+            }
+
+            .hero-content h2 {
+                font-size: 2rem;
+            }
+
+            .hero-features {
+                grid-template-columns: 1fr;
+            }
+
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .trust-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        /* Swahili toggle */
         .swahili { display: none; }
         .show-sw .english { display: none; }
         .show-sw .swahili { display: block; }
-
-        /* Loading animation */
-        .loading-pulse {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
     </style>
-
+<base target="_blank">
 </head>
 <body>
-    <header>
-        <nav class="container">
-            <div class="logo">
-                <span class="logo-icon">🌍</span>
-                <span>RODIN</span>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="brand">
+                <div class="brand-icon">🌍</div>
+                <div class="brand-text">
+                    <h1>RODIN</h1>
+                    <p class="english">Logistics for Africa</p>
+                    <p class="swahili">Usafirishaji wa Afrika</p>
+                </div>
             </div>
-            <button class="lang-toggle" onclick="toggleLang()">
-                <span class="english">Switch to Swahili</span>
-                <span class="swahili">Badilisha Kiingereza</span>
-            </button>
-        </nav>
-    </header>
+            <div class="nav-links">
+                <a href="#services" class="english">Services</a>
+                <a href="#services" class="swahili">Huduma</a>
+                <a href="#how-it-works" class="english">How It Works</a>
+                <a href="#how-it-works" class="swahili">Jinsi Inavyofanya</a>
+                <a href="#track">Track Cargo</a>
+                <button class="btn-login" onclick="toggleLang()">
+                    <span class="english">Switch to Swahili</span>
+                    <span class="swahili">Badilisha Kiingereza</span>
+                </button>
+            </div>
+        </div>
+    </nav>
 
+    <!-- Hero Section -->
     <section class="hero">
-        <div class="container">
-            <h1 class="english">The Smart Way to Move Cargo in Tanzania</h1>
-            <h1 class="swahili">Njia Smart ya kusafirisha Mizigo Tanzania</h1>
-            <p class="subtitle english">Connect with verified truck drivers. Track your cargo in real-time. Pay securely with M-Pesa.</p>
-            <p class="subtitle swahili">Unganika na dereva waliohakikiwa. Fuatilia mizigo kwa wakati halisi. Lipa kwa usalama na M-Pesa.</p>
-            <p class="subtitle-sw english">Simple. Safe. Fast.</p>
-            <p class="subtitle-sw swahili">Rahisi. Salama. Haraka.</p>
-            <p class="tagline">Built to move.</p>
+        <div class="hero-card">
+            <div class="hero-content">
+                <h2 class="english">The Smart Way to Move Cargo Across Africa</h2>
+                <h2 class="swahili">Njia Smart ya Kusafirisha Mizigo Afrika</h2>
+                <p class="english">Connect with verified truck drivers. Track your cargo in real-time. Pay securely with mobile money. From Dar es Salaam to Lagos, we've got you covered.</p>
+                <p class="swahili">Unganika na dereva waliohakikiwa. Fuatilia mizigo kwa wakati halisi. Lipa kwa usalama na pesa za simu. Kutoka Dar es Salaam hadi Lagos, tumekufunika.</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary" onclick="scrollToSignup()">
+                        <span class="english">🚀 Get Started</span>
+                        <span class="swahili">🚀 Anza Sasa</span>
+                    </button>
+                    <button class="btn-secondary" onclick="scrollToTrack()">
+                        <span class="english">📍 Track Cargo</span>
+                        <span class="swahili">📍 Fuatilia Mizigo</span>
+                    </button>
+                </div>
+            </div>
+            <div class="hero-features">
+                <div class="feature-tile">
+                    <div class="icon">📦</div>
+                    <h3 class="english">Post Loads</h3>
+                    <h3 class="swahili">Tangaza Mizigo</h3>
+                    <p class="english">Ship anything, anywhere</p>
+                    <p class="swahili">Safirisha chochote, popote</p>
+                </div>
+                <div class="feature-tile">
+                    <div class="icon">🚛</div>
+                    <h3 class="english">Find Trucks</h3>
+                    <h3 class="swahili">Tafuta Malori</h3>
+                    <p class="english">Verified drivers nearby</p>
+                    <p class="swahili">Madereva waliohakikiwa</p>
+                </div>
+                <div class="feature-tile">
+                    <div class="icon">📍</div>
+                    <h3 class="english">Live Tracking</h3>
+                    <h3 class="swahili">Ufuatiliaji wa Moja</h3>
+                    <p class="english">GPS in real-time</p>
+                    <p class="swahili">GPS kwa wakati halisi</p>
+                </div>
+                <div class="feature-tile">
+                    <div class="icon">💰</div>
+                    <h3 class="english">Secure Pay</h3>
+                    <h3 class="swahili">Lipa Kwa Usalama</h3>
+                    <p class="english">M-Pesa & mobile money</p>
+                    <p class="swahili">M-Pesa na pesa za simu</p>
+                </div>
+            </div>
         </div>
     </section>
 
-    <section class="container">
-        <div class="user-types">
-            <div class="user-card">
-                <div class="icon">📦</div>
-                <h2 class="english">I Need to Ship Cargo</h2>
-                <h2 class="swahili">Nahitaji Kusafirisha Mizigo</h2>
-                <p class="english">Post your load. Get instant quotes from nearby trucks. Track delivery live.</p>
-                <p class="swahili">Tangaza mizigo yako. Pata bei papo hapo. Fuatilia usafirishaji.</p>
-                <a href="#signup" class="btn btn-primary english">Shipper Sign Up</a>
-                <a href="#signup" class="btn btn-primary swahili">Jiunge kama Mteja</a>
+    <!-- Services Section -->
+    <section class="services-section" id="services">
+        <div class="section-header">
+            <h2 class="english">What You Can Do</h2>
+            <h2 class="swahili">Unachoweza Kufanya</h2>
+            <p class="english">Everything you need to move cargo efficiently across Africa</p>
+            <p class="swahili">Kila kitu unachohitaji kusafirisha mizigo kwa ufanisi Afrika</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">📦</div>
+                <h3 class="english">Ship Cargo</h3>
+                <h3 class="swahili">Safirisha Mizigo</h3>
+                <p class="english">Post your load with detailed specifications. Get matched with verified truck drivers in minutes.</p>
+                <p class="swahili">Tangaza mizigo yako kwa maelezo kamili. Pata dereva waliohakikiwa kwa dakika.</p>
             </div>
-            <div class="user-card">
-                <div class="icon">🚛</div>
-                <h2 class="english">I Have a Truck</h2>
-                <h2 class="swahili">Nina Lori</h2>
-                <p class="english">Find loads near you. Earn more with less empty trips. Get paid fast.</p>
-                <p class="swahili">Tafuta mizigo karibu. Pata zaidi na safari chache za bila mizigo.</p>
-                <a href="#signup" class="btn btn-secondary english">Driver Sign Up</a>
-                <a href="#signup" class="btn btn-secondary swahili">Jiunge kama Dereva</a>
+            <div class="service-card">
+                <div class="service-icon">🚛</div>
+                <h3 class="english">Drive & Earn</h3>
+                <h3 class="swahili">Endesha & Pata</h3>
+                <p class="english">Find loads near you, reduce empty trips, and get paid fast through mobile money.</p>
+                <p class="swahili">Tafuta mizigo karibu, punguza safari za bila mizigo, na lipwa haraka.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">📍</div>
+                <h3 class="english">Track & Trace</h3>
+                <h3 class="swahili">Fuatilia & Tafuta</h3>
+                <p class="english">Real-time GPS tracking with SMS notifications at every milestone.</p>
+                <p class="swahili">Ufuatiliaji wa GPS kwa wakati halisi na arifa za SMS kila hatua.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🛡️</div>
+                <h3 class="english">Secure Payments</h3>
+                <h3 class="swahili">Malipo ya Usalama</h3>
+                <p class="english">Pay with M-Pesa, Tigo Pesa, or Airtel Money. Escrow protection for every transaction.</p>
+                <p class="swahili">Lipa na M-Pesa, Tigo Pesa, au Airtel Money. Ulinzi wa escrow kwa kila miamala.</p>
             </div>
         </div>
     </section>
 
-    <section class="how-it-works">
-        <div class="container">
-            <h2 class="section-title english">How It Works</h2>
-            <h2 class="section-title swahili">Jinsi Inavyofanya Kazi</h2>
-            <div class="steps">
-                <div class="step">
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="how-container">
+            <div class="section-header">
+                <h2 class="english">How It Works</h2>
+                <h2 class="swahili">Jinsi Inavyofanya Kazi</h2>
+                <p class="english">Three simple steps to move your cargo</p>
+                <p class="swahili">Hatua tatu rahisi kusafirisha mizigo yako</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
                     <div class="step-number">1</div>
-                    <h3 class="english">Post or Find</h3>
-                    <h3 class="swahili">Tangaza au Tafuta</h3>
-                    <p class="english">Shippers post loads. Drivers browse nearby jobs.</p>
-                    <p class="swahili">Wateja wana tangaza. Madereva wanatafuta kazi.</p>
+                    <h3 class="english">Post Your Load</h3>
+                    <h3 class="swahili">Tangaza Mizigo Yako</h3>
+                    <p class="english">Describe your cargo, pickup & drop-off locations, and preferred schedule.</p>
+                    <p class="swahili">Eleza mizigo yako, mahali pa kuchukua & kuwasiliana, na ratiba unayopendelea.</p>
                 </div>
-                <div class="step">
+                <div class="step-card">
                     <div class="step-number">2</div>
-                    <h3 class="english">Match & Track</h3>
-                    <h3 class="swahili">Linganisha & Fuatilia</h3>
-                    <p class="english">Get matched instantly. Track your cargo on the map.</p>
-                    <p class="swahili">Linganishwa mara moja. Fuatilia kwenye ramani.</p>
+                    <h3 class="english">Get Matched</h3>
+                    <h3 class="swahili">Linganishwa</h3>
+                    <p class="english">Our algorithm finds the best verified driver for your route and cargo type.</p>
+                    <p class="swahili">Algorithm yetu inapata dereva bora zaidi wa kuhakikiwa kwa njia yako.</p>
                 </div>
-                <div class="step">
+                <div class="step-card">
                     <div class="step-number">3</div>
-                    <h3 class="english">Deliver & Pay</h3>
-                    <h3 class="swahili">Wasiliana & Lipa</h3>
-                    <p class="english">Confirm delivery. Pay safely via mobile money.</p>
-                    <p class="swahili">Thibitisha usafirishaji. Lipa kwa usalama.</p>
+                    <h3 class="english">Track & Deliver</h3>
+                    <h3 class="swahili">Fuatilia & Wasiliana</h3>
+                    <p class="english">Track in real-time, receive SMS updates, and pay securely upon delivery.</p>
+                    <p class="swahili">Fuatilia kwa wakati halisi, pokea arifa za SMS, na lipa kwa usalama baada ya kutoa.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- LOGIN SECTION -->
-    <section class="login-section" id="login">
-        <div class="container">
-            <h2 class="english">Already Have an Account?</h2>
-            <h2 class="swahili">Je, Unayo Akaunti Tayari?</h2>
-            <p class="english">Login to access your dashboard and manage your loads.</p>
-            <p class="swahili">Ingia kufikia dashibodi yako na kudhibiti mizigo yako.</p>
-
-            <form class="signup-form" id="loginForm">
-                <div class="form-group">
-                    <input type="tel" id="loginPhone" placeholder="Phone Number / Namba ya Simu" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="loginPassword" placeholder="Password / Nywila" required>
-                </div>
-                <button type="submit" class="btn btn-secondary english">Login</button>
-                <button type="submit" class="btn btn-secondary swahili">Ingia</button>
-            </form>
-            <div id="loginMessage"></div>
+    <!-- Trust Section -->
+    <section class="trust-section">
+        <div class="section-header">
+            <h2 class="english">Why Choose Rodin</h2>
+            <h2 class="swahili">Kwa Nini Chague Rodin</h2>
+            <p class="english">Built on bedrock, moving Africa forward</p>
+            <p class="swahili">Imejengwa kwenye mchanga, inasonga Afrika mbele</p>
+        </div>
+        <div class="trust-grid">
+            <div class="trust-item">
+                <div class="icon">✅</div>
+                <h4 class="english">Verified Drivers</h4>
+                <h4 class="swahili">Madereva Waliothibitishwa</h4>
+                <p class="english">Every driver is vetted with license & vehicle verification</p>
+                <p class="swahili">Kila dereva ameangaliwa na leseni & uthibitisho wa gari</p>
+            </div>
+            <div class="trust-item">
+                <div class="icon">🔒</div>
+                <h4 class="english">Secure Payments</h4>
+                <h4 class="swahili">Malipo ya Usalama</h4>
+                <p class="english">Escrow protection with M-Pesa integration</p>
+                <p class="swahili">Ulinzi wa escrow na M-Pesa</p>
+            </div>
+            <div class="trust-item">
+                <div class="icon">📱</div>
+                <h4 class="english">24/7 Tracking</h4>
+                <h4 class="swahili">Ufuatiliaji 24/7</h4>
+                <p class="english">Real-time GPS + SMS notifications</p>
+                <p class="swahili">GPS kwa wakati halisi + arifa za SMS</p>
+            </div>
+            <div class="trust-item">
+                <div class="icon">🌍</div>
+                <h4 class="english">Africa Coverage</h4>
+                <h4 class="swahili">Ufuniko wa Afrika</h4>
+                <p class="english">From Tanzania to Nigeria, Kenya to Ghana</p>
+                <p class="swahili">Kutoka Tanzania hadi Nigeria, Kenya hadi Ghana</p>
+            </div>
         </div>
     </section>
 
-    <!-- SIGNUP SECTION -->
-    <section class="signup-section" id="signup">
-        <div class="container">
-            <h2 class="english">Join the Waiting List</h2>
-            <h2 class="swahili">Jiunge na Orodha ya Wanaosubiri</h2>
-            <p class="english">Be the first to know when we launch. No spam.</p>
-            <p class="swahili">Kuwa wa kwanza kujua. Hakuna spam.</p>
-
-            <form class="signup-form" id="signupForm">
-                <div class="form-group">
-                    <input type="text" id="regName" placeholder="Your Name / Jina Lako" required>
-                </div>
-                <div class="form-group">
-                    <input type="tel" id="regPhone" placeholder="Phone (e.g. 0712 345 678)" required>
-                </div>
-                <div class="form-group">
-                    <select id="regUserType" required>
-                        <option value="">I am a... / Mimi ni...</option>
-                        <option value="shipper">Shipper (Mteja)</option>
-                        <option value="driver">Truck Driver (Dereva)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="regPassword" placeholder="Password / Nywila" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" id="regCity" placeholder="City / Mji (e.g. Dar es Salaam)" required>
-                </div>
-                <button type="submit" class="btn btn-secondary english">Create Account</button>
-                <button type="submit" class="btn btn-secondary swahili">Tengeneza Akaunti</button>
-            </form>
-            <div id="signupMessage"></div>
+    <!-- CTA Section -->
+    <section class="cta-section" id="signup">
+        <div class="cta-card">
+            <h2 class="english">Ready to Move Your Cargo?</h2>
+            <h2 class="swahili">Tayari Kusafirisha Mizigo Yako?</h2>
+            <p class="english">Join thousands of shippers and drivers across Africa. Sign up today and get your first load moving within hours.</p>
+            <p class="swahili">Jiunge na maelfu ya wateja na madereva Afrika. Jiunge leo na pata mizigo yako ya kwanza inayoenda ndani ya masaa.</p>
+            <button class="btn-primary" style="font-size: 1.1rem; padding: 1.2rem 2.5rem;" onclick="showSignupModal()">
+                <span class="english">🚀 Start Shipping Now</span>
+                <span class="swahili">🚀 Anza Kusafirisha Sasa</span>
+            </button>
         </div>
     </section>
 
+    <!-- Footer -->
     <footer>
-        <div class="container">
-            <div class="brand">🌍 RODIN</div>
-            <p class="tagline">Built to move.</p>
-            <p class="english">© 2026 Rodin. Tanzania. All rights reserved.</p>
-            <p class="swahili">© 2026 Rodin. Tanzania. Haki zote zimehifadhiwa.</p>
-            <p class="english" style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.7;">Inspired by Rodinia — the ancient supercontinent that connected all land.</p>
-            <p class="swahili" style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.7;">Imehamasishwa na Rodinia — bara kubwa la kale liliyounganisha ardhi yote.</p>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>🌍 RODIN</h3>
+                <p class="english">Logistics for Africa</p>
+                <p class="swahili">Usafirishaji wa Afrika</p>
+                <p style="margin-top: 1rem; color: rgba(255,255,255,0.6); font-size: 0.85rem; max-width: 300px;">
+                    Built on bedrock. Moving Africa forward. From the Rift Valley to the world.
+                </p>
+            </div>
+            <div class="footer-links">
+                <h4 class="english">Services</h4>
+                <h4 class="swahili">Huduma</h4>
+                <a href="#">Ship Cargo</a>
+                <a href="#">Find Loads</a>
+                <a href="#">Track & Trace</a>
+                <a href="#">Enterprise</a>
+            </div>
+            <div class="footer-links">
+                <h4 class="english">Company</h4>
+                <h4 class="swahili">Kampuni</h4>
+                <a href="#">About Us</a>
+                <a href="#">Careers</a>
+                <a href="#">Press</a>
+                <a href="#">Contact</a>
+            </div>
+            <div class="footer-links">
+                <h4 class="english">Support</h4>
+                <h4 class="swahili">Msaada</h4>
+                <a href="#">Help Center</a>
+                <a href="#">Safety</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 Rodin. All rights reserved. | Inspired by Rodinia — the ancient supercontinent that connected all land.</p>
         </div>
     </footer>
 
     <script>
-        // Language toggle
-        function toggleLang() { 
-            document.body.classList.toggle('show-sw'); 
+        function toggleLang() {
+            document.body.classList.toggle('show-sw');
         }
 
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
-            });
-        });
+        function scrollToSignup() {
+            document.getElementById('signup').scrollIntoView({ behavior: 'smooth' });
+        }
 
-        // API base URL
-        const API_URL = 'https://mzigofasta.onrender.com';
+        function scrollToTrack() {
+            alert('Tracking feature coming in Phase 2! / Ufuatiliaji unakuja katika Hatua ya 2!');
+        }
 
-        // Handle LOGIN form submission
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const phone = document.getElementById('loginPhone').value;
-            const password = document.getElementById('loginPassword').value;
-            const msgDiv = document.getElementById('loginMessage');
-
-            try {
-                const response = await fetch(`${API_URL}/api/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone, password })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('userId', data.user.id);
-                    localStorage.setItem('userType', data.user.user_type);
-                    localStorage.setItem('userName', data.user.name);
-
-                    msgDiv.className = 'message message-success';
-                    msgDiv.innerHTML = '✅ Login successful! Redirecting... / Kuingia kumefanikiwa! Inaelekeza...';
-
-                    setTimeout(() => {
-                        if (data.user.user_type === 'shipper') {
-                            window.location.href = 'shipper-dashboard.html';
-                        } else {
-                            window.location.href = 'driver-dashboard.html';
-                        }
-                    }, 1500);
-                } else {
-                    msgDiv.className = 'message message-error';
-                    msgDiv.innerHTML = `❌ ${data.error || 'Invalid phone or password / Namba au nywila si sahihi'}`;
-                }
-            } catch (error) {
-                msgDiv.className = 'message message-error';
-                msgDiv.innerHTML = '❌ Server error. Please try again. / Kosa la seva. Jaribu tena.';
-            }
-        });
-
-        // Handle SIGNUP form submission
-        document.getElementById('signupForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const name = document.getElementById('regName').value;
-            const phone = document.getElementById('regPhone').value;
-            const user_type = document.getElementById('regUserType').value;
-            const password = document.getElementById('regPassword').value;
-            const city = document.getElementById('regCity').value;
-            const msgDiv = document.getElementById('signupMessage');
-
-            try {
-                const response = await fetch(`${API_URL}/api/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, phone, user_type, password, city })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('userId', data.user.id);
-                    localStorage.setItem('userType', data.user.user_type);
-                    localStorage.setItem('userName', data.user.name);
-
-                    msgDiv.className = 'message message-success';
-                    msgDiv.innerHTML = '✅ Account created! Redirecting... / Akaunti imeundwa! Inaelekeza...';
-
-                    setTimeout(() => {
-                        if (data.user.user_type === 'shipper') {
-                            window.location.href = 'shipper-dashboard.html';
-                        } else {
-                            window.location.href = 'driver-dashboard.html';
-                        }
-                    }, 2000);
-                } else {
-                    msgDiv.className = 'message message-error';
-                    msgDiv.innerHTML = `❌ ${data.error || 'Registration failed'}`;
-                }
-            } catch (error) {
-                msgDiv.className = 'message message-error';
-                msgDiv.innerHTML = '❌ Server error. Please try again.';
-            }
-        });
+        function showSignupModal() {
+            window.location.href = 'shipper-dashboard.html';
+        }
     </script>
 </body>
 </html>
