@@ -1,0 +1,499 @@
+[PASTE HTML HERE]<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rodin - Transporter Dashboard | Fleet Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --deep-crust: #1B3A4B;
+            --mantle-green: #2D6A4F;
+            --magma-orange: #E85D04;
+            --golden-core: #F4A261;
+            --ocean-blue: #264653;
+            --sky-blue: #4A90E2;
+            --light-bg: #F0F4F8;
+            --white: #FFFFFF;
+            --text-dark: #1B3A4B;
+            --text-muted: #6B7280;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--light-bg); color: var(--text-dark); line-height: 1.6; }
+        .navbar { background: linear-gradient(135deg, var(--deep-crust) 0%, var(--ocean-blue) 100%); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 20px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--mantle-green), var(--sky-blue)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .brand-text h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--white); line-height: 1.2; }
+        .brand-text p { font-size: 0.7rem; color: var(--golden-core); letter-spacing: 1px; text-transform: uppercase; }
+        .nav-actions { display: flex; gap: 1rem; align-items: center; }
+        .user-info { color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-right: 1rem; }
+        .btn-logout { background: var(--magma-orange); color: var(--white); padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s; }
+        .btn-logout:hover { background: #d15104; transform: translateY(-1px); }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--white); border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-left: 4px solid var(--mantle-green); }
+        .stat-card:nth-child(2) { border-left-color: var(--sky-blue); }
+        .stat-card:nth-child(3) { border-left-color: var(--magma-orange); }
+        .stat-card:nth-child(4) { border-left-color: var(--golden-core); }
+        .stat-card h3 { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card .value { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700; color: var(--deep-crust); }
+        .stat-card .change { font-size: 0.85rem; color: var(--success); margin-top: 0.25rem; }
+        .tab-nav { display: flex; gap: 0.5rem; margin-bottom: 2rem; background: var(--white); padding: 0.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        .tab-btn { padding: 0.75rem 1.5rem; border-radius: 8px; border: none; background: transparent; color: var(--text-muted); font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+        .tab-btn.active { background: linear-gradient(135deg, var(--mantle-green), var(--sky-blue)); color: var(--white); }
+        .tab-btn:hover:not(.active) { background: var(--light-bg); color: var(--text-dark); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .card { background: var(--white); border-radius: 20px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .card h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; color: var(--deep-crust); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; }
+        .approval-card { background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; border-left: 4px solid var(--warning); box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .approval-card.urgent { background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%); border-left-color: var(--danger); animation: pulse-border 2s infinite; }
+        @keyframes pulse-border { 0%, 100% { border-left-width: 4px; } 50% { border-left-width: 8px; } }
+        .approval-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; }
+        .approval-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: var(--deep-crust); font-size: 1.1rem; }
+        .approval-meta { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
+        .approval-badge { background: var(--warning); color: var(--white); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .approval-badge.urgent { background: var(--danger); }
+        .approval-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem; padding: 1rem; background: rgba(255,255,255,0.6); border-radius: 10px; }
+        .approval-detail { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-dark); }
+        .approval-actions { display: flex; gap: 1rem; }
+        .btn-approve { background: linear-gradient(135deg, var(--mantle-green), #059669); color: var(--white); padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; }
+        .btn-approve:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+        .btn-deny { background: linear-gradient(135deg, var(--danger), #DC2626); color: var(--white); padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; }
+        .btn-deny:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+        .btn-view { background: var(--light-bg); color: var(--text-dark); padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; border: 2px solid #E5E7EB; cursor: pointer; transition: all 0.3s; }
+        .btn-view:hover { background: #E5E7EB; }
+        .driver-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+        .driver-card { background: var(--white); border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.3s; }
+        .driver-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+        .driver-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .driver-avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--mantle-green), var(--sky-blue)); display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: 700; font-size: 1.2rem; }
+        .driver-info h4 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: var(--deep-crust); }
+        .driver-info p { font-size: 0.85rem; color: var(--text-muted); }
+        .driver-status { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 0.5rem; }
+        .driver-status.available { background: #D1FAE5; color: #065F46; }
+        .driver-status.busy { background: #DBEAFE; color: #1E40AF; }
+        .driver-status.offline { background: #F3F4F6; color: #6B7280; }
+        .earnings-chart { height: 300px; background: linear-gradient(135deg, var(--light-bg), #E5E7EB); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 1.1rem; }
+        .payment-methods { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+        .payment-method { background: var(--white); border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.06); transition: all 0.3s; border: 2px solid transparent; }
+        .payment-method:hover { border-color: var(--sky-blue); transform: translateY(-2px); }
+        .payment-method .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .payment-method h4 { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .payment-method p { font-size: 0.85rem; color: var(--text-muted); }
+        .payment-method .status { display: inline-block; margin-top: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .payment-method .status.active { background: #D1FAE5; color: #065F46; }
+        .payment-method .status.pending { background: #FEF3C7; color: #92400E; }
+        @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .approval-details { grid-template-columns: 1fr; } .driver-grid { grid-template-columns: 1fr; } .tab-nav { overflow-x: auto; } .navbar { padding: 1rem; } .user-info { display: none; } }
+        .hidden { display: none !important; }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand">
+            <div class="brand-icon">🌍</div>
+            <div class="brand-text">
+                <h1>RODIN</h1>
+                <p>Moving Africa forward</p>
+            </div>
+        </div>
+        <div class="nav-actions">
+            <span class="user-info" id="userName">Welcome, Transporter</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Active Drivers</h3>
+                <div class="value" id="activeDrivers">5</div>
+                <div class="change">3 available now</div>
+            </div>
+            <div class="stat-card">
+                <h3>Pending Approvals</h3>
+                <div class="value" id="pendingApprovals">2</div>
+                <div class="change" style="color: var(--warning);">Needs attention</div>
+            </div>
+            <div class="stat-card">
+                <h3>This Week's Earnings</h3>
+                <div class="value" id="weeklyEarnings">TSh 0</div>
+                <div class="change">+15% vs last week</div>
+            </div>
+            <div class="stat-card">
+                <h3>Completed Jobs</h3>
+                <div class="value" id="completedJobs">0</div>
+                <div class="change">98% on time</div>
+            </div>
+        </div>
+
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="showTab('approvals')">📋 Approvals</button>
+            <button class="tab-btn" onclick="showTab('drivers')">👥 My Drivers</button>
+            <button class="tab-btn" onclick="showTab('loads')">📦 Available Loads</button>
+            <button class="tab-btn" onclick="showTab('earnings')">💰 Earnings</button>
+            <button class="tab-btn" onclick="showTab('payments')">💳 Payments</button>
+        </div>
+
+        <div class="tab-content active" id="approvals-tab">
+            <div class="card">
+                <h2>⏳ Driver Approval Requests</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">When your drivers request loads, they appear here. Approve or deny requests to manage your fleet.</p>
+                <div id="approvalRequests">
+                    <div class="approval-card urgent">
+                        <div class="approval-header">
+                            <div>
+                                <div class="approval-title">Driver John Requests: Maize 10 tons</div>
+                                <div class="approval-meta">Requested 5 minutes ago • Driver: John Doe (0712 345 678)</div>
+                            </div>
+                            <span class="approval-badge urgent">URGENT</span>
+                        </div>
+                        <div class="approval-details">
+                            <div class="approval-detail">📍 Dar es Salaam → Dodoma</div>
+                            <div class="approval-detail">📦 100 kg Bags</div>
+                            <div class="approval-detail">💰 TSh 350,000</div>
+                        </div>
+                        <div class="approval-actions">
+                            <button class="btn-approve" onclick="approveRequest(1)">✅ Approve & Assign</button>
+                            <button class="btn-deny" onclick="denyRequest(1)">❌ Deny Request</button>
+                            <button class="btn-view" onclick="viewLoadDetails(1)">👁️ View Details</button>
+                        </div>
+                    </div>
+                    <div class="approval-card">
+                        <div class="approval-header">
+                            <div>
+                                <div class="approval-title">Driver Sarah Requests: Cement 25 tons</div>
+                                <div class="approval-meta">Requested 15 minutes ago • Driver: Sarah Kim (0713 456 789)</div>
+                            </div>
+                            <span class="approval-badge">NEW</span>
+                        </div>
+                        <div class="approval-details">
+                            <div class="approval-detail">📍 Arusha → Mwanza</div>
+                            <div class="approval-detail">📦 Loose Cargo</div>
+                            <div class="approval-detail">💰 TSh 875,000</div>
+                        </div>
+                        <div class="approval-actions">
+                            <button class="btn-approve" onclick="approveRequest(2)">✅ Approve & Assign</button>
+                            <button class="btn-deny" onclick="denyRequest(2)">❌ Deny Request</button>
+                            <button class="btn-view" onclick="viewLoadDetails(2)">👁️ View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h2>✅ Recently Approved</h2>
+                <div id="approvedRequests">
+                    <div class="approval-card" style="border-left-color: var(--success); background: linear-gradient(135deg, #D1FAE5, #A7F3D0);">
+                        <div class="approval-header">
+                            <div>
+                                <div class="approval-title">Wall Putty 32 tons - APPROVED</div>
+                                <div class="approval-meta">Approved 2 hours ago • Driver: Mike Johnson</div>
+                            </div>
+                            <span class="approval-badge" style="background: var(--success);">APPROVED</span>
+                        </div>
+                        <div class="approval-details">
+                            <div class="approval-detail">📍 Tanga → Dodoma</div>
+                            <div class="approval-detail">📦 25 kg Bags</div>
+                            <div class="approval-detail">💰 TSh 2,720,000</div>
+                        </div>
+                        <div class="approval-actions">
+                            <button class="btn-view" onclick="trackLoad(3)">📍 Track Load</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="drivers-tab">
+            <div class="card">
+                <h2>👥 My Fleet</h2>
+                <div class="driver-grid" id="driverList">
+                    <div class="driver-card">
+                        <div class="driver-header">
+                            <div class="driver-avatar">JD</div>
+                            <div class="driver-info">
+                                <h4>John Doe</h4>
+                                <p>0712 345 678 • Flatbed Truck</p>
+                                <span class="driver-status available">🟢 Available</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #E5E7EB;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-muted);">
+                                <span>Completed: 45 jobs</span>
+                                <span>Rating: ⭐ 4.8</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="driver-card">
+                        <div class="driver-header">
+                            <div class="driver-avatar">SK</div>
+                            <div class="driver-info">
+                                <h4>Sarah Kim</h4>
+                                <p>0713 456 789 • Refrigerated</p>
+                                <span class="driver-status busy">🔵 On Job</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #E5E7EB;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-muted);">
+                                <span>Completed: 32 jobs</span>
+                                <span>Rating: ⭐ 4.9</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="driver-card">
+                        <div class="driver-header">
+                            <div class="driver-avatar">MJ</div>
+                            <div class="driver-info">
+                                <h4>Mike Johnson</h4>
+                                <p>0714 567 890 • Tanker</p>
+                                <span class="driver-status offline">⚫ Offline</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #E5E7EB;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-muted);">
+                                <span>Completed: 67 jobs</span>
+                                <span>Rating: ⭐ 4.7</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="loads-tab">
+            <div class="card">
+                <h2>📦 Available Loads Near You</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Browse available loads. Assign them to your drivers or request approval for your drivers to take them.</p>
+                <div id="availableLoads">
+                    <div class="approval-card" style="background: var(--white); border-left-color: var(--sky-blue);">
+                        <div class="approval-header">
+                            <div>
+                                <div class="approval-title">Rice 50 tons • TSh 1,750,000</div>
+                                <div class="approval-meta">Posted 1 hour ago • Shipper: ABC Traders</div>
+                            </div>
+                            <span class="approval-badge" style="background: var(--sky-blue);">OPEN</span>
+                        </div>
+                        <div class="approval-details">
+                            <div class="approval-detail">📍 Morogoro → Dar es Salaam</div>
+                            <div class="approval-detail">📦 50 kg Bags</div>
+                            <div class="approval-detail">🚛 Large Truck (15-ton)</div>
+                        </div>
+                        <div class="approval-actions">
+                            <button class="btn-approve" onclick="assignToDriver(1)">👤 Assign to Driver</button>
+                            <button class="btn-view" onclick="viewLoadDetails(1)">👁️ View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="earnings-tab">
+            <div class="card">
+                <h2>💰 Earnings Overview</h2>
+                <div class="earnings-chart">📊 Earnings Chart - Coming in Phase 3B</div>
+            </div>
+            <div class="card">
+                <h2>📋 Recent Transactions</h2>
+                <div id="transactionsList">
+                    <div style="display: flex; justify-content: space-between; padding: 1rem; border-bottom: 1px solid #E5E7EB;">
+                        <div>
+                            <div style="font-weight: 600;">Maize Delivery - John Doe</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">June 10, 2026</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700; color: var(--success);">+TSh 350,000</div>
+                            <div style="font-size: 0.85rem; color: var(--success);">✅ Paid</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 1rem; border-bottom: 1px solid #E5E7EB;">
+                        <div>
+                            <div style="font-weight: 600;">Cement Delivery - Sarah Kim</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">June 9, 2026</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700; color: var(--warning);">+TSh 875,000</div>
+                            <div style="font-size: 0.85rem; color: var(--warning);">⏳ Pending</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="payments-tab">
+            <div class="card">
+                <h2>💳 Payment Methods</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Connect your preferred payment methods to receive earnings and pay for platform services.</p>
+                <div class="payment-methods">
+                    <div class="payment-method">
+                        <div class="icon">📱</div>
+                        <h4>M-Pesa</h4>
+                        <p>Vodacom Tanzania</p>
+                        <span class="status active">✅ Connected</span>
+                    </div>
+                    <div class="payment-method">
+                        <div class="icon">📱</div>
+                        <h4>Tigo Pesa</h4>
+                        <p>Tigo Tanzania</p>
+                        <span class="status pending">⏳ Pending</span>
+                    </div>
+                    <div class="payment-method">
+                        <div class="icon">📱</div>
+                        <h4>Airtel Money</h4>
+                        <p>Airtel Tanzania</p>
+                        <span class="status pending">⏳ Pending</span>
+                    </div>
+                    <div class="payment-method">
+                        <div class="icon">🏦</div>
+                        <h4>NMB Bank</h4>
+                        <p>Bank Transfer</p>
+                        <span class="status pending">⏳ Pending</span>
+                    </div>
+                    <div class="payment-method">
+                        <div class="icon">🏦</div>
+                        <h4>CRDB Bank</h4>
+                        <p>Bank Transfer</p>
+                        <span class="status pending">⏳ Pending</span>
+                    </div>
+                    <div class="payment-method">
+                        <div class="icon">🏦</div>
+                        <h4>NBC Bank</h4>
+                        <p>Bank Transfer</p>
+                        <span class="status pending">⏳ Pending</span>
+                    </div>
+                    <div class="payment-method">
+                        <div class="icon">🔗</div>
+                        <h4>Selcom</h4>
+                        <p>Payment Gateway</p>
+                        <span class="status pending">⏳ Setup Required</span>
+                    </div>
+                    <div class="payment-method">
+                        <div class="icon">📲</div>
+                        <h4>Lipa Namba</h4>
+                        <p>Merchant Code</p>
+                        <span class="status pending">⏳ Pending</span>
+                    </div>
+                    <div class="payment-method">
+                        <div class="icon">📷</div>
+                        <h4>Tan-QR</h4>
+                        <p>QR Code Payment</p>
+                        <span class="status pending">⏳ Coming Soon</span>
+                    </div>
+                    <div class="payment-method">
+                        <div class="icon">⚡</div>
+                        <h4>Tan-CIS</h4>
+                        <p>Instant Transfer</p>
+                        <span class="status pending">⏳ Coming Soon</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h2>🔔 Selcom Integration</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Selcom is the recommended payment gateway for Rodin. It aggregates M-Pesa, Tigo Pesa, Airtel Money, and bank payments into one API.</p>
+                <div style="background: linear-gradient(135deg, #EBF5FF, #DBEAFE); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--sky-blue);">
+                    <h4 style="color: var(--deep-crust); margin-bottom: 0.5rem;">Why Selcom?</h4>
+                    <ul style="color: var(--text-dark); padding-left: 1.5rem; line-height: 1.8;">
+                        <li>One API for all mobile money providers</li>
+                        <li>Bank integration included</li>
+                        <li>Well-documented Tanzanian fintech</li>
+                        <li>Used by Jumia, Uber, and major platforms</li>
+                        <li>Supports Lipa Namba and QR codes</li>
+                    </ul>
+                    <button class="btn-approve" style="margin-top: 1rem;" onclick="window.open('https://selcom.net', '_blank')">🌐 Visit Selcom Website</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://mzigofasta.onrender.com';
+        const userName = localStorage.getItem('userName') || 'Transporter';
+        document.getElementById('userName').textContent = 'Welcome, ' + userName;
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function approveRequest(id) {
+            if (confirm('Approve this load request? The driver will be assigned immediately.')) {
+                console.log('Approving request:', id);
+                alert('✅ Request approved! Driver has been notified via SMS.');
+            }
+        }
+
+        function denyRequest(id) {
+            const reason = prompt('Why are you denying this request? (Optional)');
+            if (reason !== null) {
+                console.log('Denying request:', id, 'Reason:', reason);
+                alert('❌ Request denied. Driver has been notified via SMS.');
+            }
+        }
+
+        function viewLoadDetails(id) {
+            alert('Load details for ID: ' + id + '
+
+Full details view coming in Phase 3B');
+        }
+
+        function trackLoad(id) {
+            window.open('https://geofreycelestine.github.io/mzigofasta/shipper-dashboard.html', '_blank');
+        }
+
+        function assignToDriver(loadId) {
+            const driverName = prompt('Enter driver name or phone number to assign:');
+            if (driverName) {
+                alert('👤 Load assigned to ' + driverName + '
+
+SMS notification sent to driver.');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userName');
+            window.location.href = 'index.html';
+        }
+
+        async function loadAvailableLoads() {
+            try {
+                const response = await fetch(API_URL + '/api/loads');
+                const data = await response.json();
+                if (data.loads && data.loads.length > 0) {
+                    const container = document.getElementById('availableLoads');
+                    container.innerHTML = data.loads.map(load => `
+                        <div class="approval-card" style="background: var(--white); border-left-color: var(--sky-blue);">
+                            <div class="approval-header">
+                                <div>
+                                    <div class="approval-title">${load.title} • TSh ${(load.total_price || 0).toLocaleString()}</div>
+                                    <div class="approval-meta">Posted ${load.created_at} • Shipper: ${load.shipper_name}</div>
+                                </div>
+                                <span class="approval-badge" style="background: var(--sky-blue);">OPEN</span>
+                            </div>
+                            <div class="approval-details">
+                                <div class="approval-detail">📍 ${load.pickup_location || 'N/A'} → ${load.dropoff_location || 'N/A'}</div>
+                                <div class="approval-detail">📦 ${load.cargo_type || 'N/A'}</div>
+                                <div class="approval-detail">🚛 ${load.truck_type_needed || 'N/A'}</div>
+                            </div>
+                            <div class="approval-actions">
+                                <button class="btn-approve" onclick="assignToDriver(${load.id})">👤 Assign to Driver</button>
+                                <button class="btn-view" onclick="viewLoadDetails(${load.id})">👁️ View Details</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading loads:', error);
+            }
+        }
+
+        loadAvailableLoads();
+    </script>
+</body>
+</html>
