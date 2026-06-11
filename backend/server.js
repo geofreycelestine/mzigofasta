@@ -137,7 +137,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'rodin-secret-2026';
 app.get('/', (req, res) => {
     res.json({ 
         message: '🌍 Rodin API is running!',
-        tagline: 'Built on bedrock. Moving what matters.',
+        tagline: 'Built to move.',
         version: '2.0.0'
     });
 });
@@ -438,5 +438,5 @@ app.get('/api/loads/:id/sms', (req, res) => {
 app.listen(PORT, () => {
     console.log(`🌍 Rodin server running on port ${PORT}`);
     console.log(`📡 API available at http://localhost:${PORT}`);
-    console.log(`🏗️ Built on bedrock. Moving what matters.`);
-});
+    console.log(`🏗️ Built to move.`);
+});// Rodin rebrand deployed
